@@ -82,6 +82,14 @@ def main():
     cv2.imshow("Trails", grid[:, :, 0] * 255)
     cv2.waitKey(0)
 
+    trails = np.zeros((HEIGHT, WIDTH), dtype=np.uint8)
+    for agent in agents:
+        grid_x = int(agent.x)
+        grid_y = int(agent.y)
+        trails[grid_y, grid_x] = 255
+    cv2.imshow("Trails", trails)
+    cv2.waitKey(0)
+
     for _ in range(NUM_STEPS):  # change _ to i when debugging
         for agent in agents:
             agent.sense(grid)
