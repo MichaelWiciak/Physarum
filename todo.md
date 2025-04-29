@@ -154,3 +154,9 @@ angle = sum(weights[i] _ (self.sensor_angle + (i - 1) _ np.pi / 4) for i in rang
 self.direction = (np.cos(angle), np.sin(angle))
 
 6. i dont think food has any effect on it at all... hmm.
+
+7. simulation doesnt currently saisfy the Agents attempt to move forward one step in their current direction.
+   If the next position is unoccupied, move and deposit a chemoattractant.
+   If occupied, remain in place, reorient randomly, and do not deposit.
+   No deposit occurs unless movement is successful.
+   so need to change it.

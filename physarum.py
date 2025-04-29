@@ -40,7 +40,7 @@ def main():
     cv2.resizeWindow("Trails", WIDTH, HEIGHT)
 
     # Create a blank grid
-    grid = initialise_grids(WIDTH, HEIGHT)
+    grid = initialise_grids(WIDTH + 10, HEIGHT + 10)
     # Create agents
     agents, occupied = initialise_agents(NUM_AGENTS, WIDTH, HEIGHT)
 
@@ -68,21 +68,28 @@ def main():
     for _ in range(NUM_STEPS):  # change _ to i when debugging
         for agent in agents:
             agent.sense(grid)
+            # old_pos = (int(agent.x), int(agent.y))
             old_pos = (agent.x, agent.y)
+            # this should be float but int causes errors, not sure why.
             # print("Step", i, "Agent", agents.index(agent))
             # print("old position", old_pos)
-            if old_pos in occupied:
-                occupied.remove(old_pos)
+            projected_x, projected_y = agent.project_move()
+            if (projected_x, projected_y) not in occupied:
+                try:
+                    occupied.remove(old_pos)
+                except KeyError:
+                    print(
+                        "Warning: Tried to remove a position that wasn't occupied!",
+                        old_pos,
+                    )
+                agent.move()
+                # new_pos = (int(agent.x), int(agent.y))
+                new_pos = (agent.x, agent.y)
+                occupied.add(new_pos)
+                agent.deposit(grid)
             else:
-                print(
-                    "Warning: Tried to remove a position that wasn't occupied!", old_pos
-                )
-            agent.move()
-            new_pos = (agent.x, agent.y)
-            # print("new position", new_pos)
-            # print("----")
-            occupied.add(new_pos)
-            agent.deposit(grid)
+                # Stay in place, reorient randomly
+                agent.direction = (random.uniform(-1, 1), random.uniform(-1, 1))
 
         # option 1: 3×3 mean filter
         kernel = np.ones((3, 3), np.float32) / 9
