@@ -9,7 +9,7 @@ def initialise_grids(width, height):
     return grid
 
 
-def initialise_agents(num_agents, width, height):
+def initialise_agents(num_agents, width, height, SO, SA, RA):
     # need to initialise agents in a unoccpied position
     agents = []
     occupied = set()
@@ -22,7 +22,7 @@ def initialise_agents(num_agents, width, height):
             x = random.randint(0, width - 1)
             y = random.randint(0, height - 1)
 
-        agent = Agent(width, height, x, y)
+        agent = Agent(width, height, x, y, SO, SA, RA)
         agents.append(agent)
         occupied.add((x, y))
     return agents, occupied
@@ -36,13 +36,28 @@ def main():
     NUM_AGENTS = 10000
     NUM_STEPS = 1000
 
+    # paremets from the paper
+    p = 2.08  # p from the paper. percentage of agents over the screen. they want 3-15 percent.
+    diffK = 3  # diffusion kernel.
+    decayT = 0.1  # Trail decay rate
+    wProj = 0.05  # Pre-pattern stimulus projection weight (optional)
+    boundary = "periodic"  # Toroidal boundaries (not implemented here)
+
+    # Agent parameters
+    SA = 45 * np.pi / 180  # 45° in radians
+    RA = 45 * np.pi / 180  # 45° rotation angle
+    SO = 9  # Sensor offset distance (pixels)
+    SS = 1  # Step size
+    depT = 5  # Chemoattractant deposition per step
+    pCD = 0.01  # Probability of random direction change
+
     cv2.namedWindow("Trails", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("Trails", WIDTH, HEIGHT)
 
     # Create a blank grid
     grid = initialise_grids(WIDTH + 10, HEIGHT + 10)
     # Create agents
-    agents, occupied = initialise_agents(NUM_AGENTS, WIDTH, HEIGHT)
+    agents, occupied = initialise_agents(NUM_AGENTS, WIDTH, HEIGHT, SO, SA, RA)
 
     # Initialise the grid with two small squares of food.
     food_size = 10
@@ -89,7 +104,7 @@ def main():
                 agent.deposit(grid)
             else:
                 # Stay in place, reorient randomly
-                agent.direction = (random.uniform(-1, 1), random.uniform(-1, 1))
+                agent.reorient()
 
         # option 1: 3×3 mean filter
         kernel = np.ones((3, 3), np.float32) / 9
