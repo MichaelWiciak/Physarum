@@ -9,7 +9,7 @@ def initialise_grids(width, height):
     return grid
 
 
-def initialise_agents(num_agents, width, height, SO, SA, RA):
+def initialise_agents(num_agents, width, height, SO, SA, RA, depT):
     # need to initialise agents in a unoccpied position
     agents = []
     occupied = set()
@@ -22,7 +22,7 @@ def initialise_agents(num_agents, width, height, SO, SA, RA):
             x = random.randint(0, width - 1)
             y = random.randint(0, height - 1)
 
-        agent = Agent(width, height, x, y, SO, SA, RA)
+        agent = Agent(width, height, x, y, SO, SA, RA, depT)
         agents.append(agent)
         occupied.add((x, y))
     return agents, occupied
@@ -37,7 +37,7 @@ def main():
     NUM_STEPS = 1000
 
     # paremets from the paper
-    p = 2.08  # p from the paper. percentage of agents over the screen. they want 3-15 percent.
+    p = 2.08  # in our case we got this val. percentage of agents over the screen. they want 3-15 percent.
     diffK = 3  # diffusion kernel.
     decayT = 0.1  # Trail decay rate
     wProj = 0.05  # Pre-pattern stimulus projection weight (optional)
@@ -51,13 +51,15 @@ def main():
     depT = 5  # Chemoattractant deposition per step
     pCD = 0.01  # Probability of random direction change
 
+    show_agents = True
+
     cv2.namedWindow("Trails", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("Trails", WIDTH, HEIGHT)
 
     # Create a blank grid
     grid = initialise_grids(WIDTH + 10, HEIGHT + 10)
     # Create agents
-    agents, occupied = initialise_agents(NUM_AGENTS, WIDTH, HEIGHT, SO, SA, RA)
+    agents, occupied = initialise_agents(NUM_AGENTS, WIDTH, HEIGHT, SO, SA, RA, depT)
 
     # Initialise the grid with two small squares of food.
     food_size = 10
@@ -88,6 +90,10 @@ def main():
             # this should be float but int causes errors, not sure why.
             # print("Step", i, "Agent", agents.index(agent))
             # print("old position", old_pos)
+            # as the paper wanted, random chance of changing direction.
+            if random.random() < pCD:
+                agent.reorient()
+
             projected_x, projected_y = agent.project_move()
             if (projected_x, projected_y) not in occupied:
                 try:
@@ -109,14 +115,23 @@ def main():
         # option 1: 3×3 mean filter
         kernel = np.ones((3, 3), np.float32) / 9
         grid[:, :, 1] = cv2.filter2D(grid[:, :, 1], -1, kernel)
-
         grid[:, :, 1] *= 1 - DECAY_RATE  # decay the trail
 
-        trails = grid[:, :, 1]
-        trails = (trails - trails.min()) / (trails.max() - trails.min())  # normalize
-        trails = (trails * 255).astype(np.uint8)
+        if show_agents:
+            # Draw agents as dots
+            trails = np.zeros((HEIGHT, WIDTH), dtype=np.uint8)
+            for agent in agents:
+                grid_x = int(agent.x)
+                grid_y = int(agent.y)
+                trails[grid_y, grid_x] = 255
+            cv2.imshow("Trails", trails)
+        else:
+            # Use trail-map (channel 1)
+            trails = grid[:, :, 1]
+            trails = (trails - trails.min()) / (trails.max() - trails.min())
+            trails = (trails * 255).astype(np.uint8)
+            cv2.imshow("Trails", trails)
 
-        cv2.imshow("Trails", trails)
         cv2.waitKey(1)
 
     cv2.destroyAllWindows()

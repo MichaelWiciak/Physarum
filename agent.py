@@ -3,7 +3,7 @@ import numpy as np
 
 
 class Agent:
-    def __init__(self, width, height, x, y, SO, SA, RA):
+    def __init__(self, width, height, x, y, SO, SA, RA, depT):
         self.width = width
         self.height = height
         self.x = float(x)
@@ -13,6 +13,7 @@ class Agent:
         self.SA = SA  # Sensor angle
         self.SO = SO  # Sensor offset
         self.RA = RA  # Rotation angle
+        self.depT = depT  # Chemoattractant deposition
 
         # can make it sense 180 or 360. current is 360. 180 is: random.uniform(0, np.pi). different behaviousr. very.
         self.sensor_angle = random.uniform(0, 2 * np.pi)
@@ -63,7 +64,7 @@ class Agent:
         grid_y = int(self.y)
         # hmmm.
         # local_grid[grid_y, grid_x, 0] += 0.1
-        local_grid[grid_y, grid_x, 1] += 0.1
+        local_grid[grid_y, grid_x, 1] += self.depT
 
     def reorient(self):
         self.direction = (random.uniform(-1, 1), random.uniform(-1, 1))

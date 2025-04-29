@@ -160,3 +160,5 @@ self.direction = (np.cos(angle), np.sin(angle))
    If occupied, remain in place, reorient randomly, and do not deposit.
    No deposit occurs unless movement is successful.
    so need to change it.
+
+8. make food better.
