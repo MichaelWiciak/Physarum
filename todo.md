@@ -2,7 +2,7 @@
 
 2.  need to enforce Discrete Occupancy: The paper specifies that each grid cell can contain only one agent. Your code does not explicitly enforce this rule. While it might not be critical for small numbers of agents, you may want to add a check to ensure no two agents occupy the same cell.
 
-3.  some things stay in the same spot
+3.  some things stay in the same spot and dont move.
     old position (703, 541)
     new position (703, 542)
 
@@ -141,3 +141,16 @@ old position (799, 599)
 new position (799, 599)
 
 ---
+
+5. its going dark wayyy to early.
+
+Consider smoothing the direction choice (e.g., weighted average of sensors) to better match continuous gradient-following.
+Example:
+
+# In sense()
+
+weights = [abs(val) for val in sensor_values] # Weight by signal strength
+angle = sum(weights[i] _ (self.sensor_angle + (i - 1) _ np.pi / 4) for i in range(3)) / sum(weights)
+self.direction = (np.cos(angle), np.sin(angle))
+
+6. i dont think food has any effect on it at all... hmm.
