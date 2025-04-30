@@ -31,17 +31,18 @@ def initialise_agents(num_agents, width, height, SO, SA, RA, depT):
 def main():
     # maybe get this from config.
     WIDTH, HEIGHT = 800, 600
-    DIFFUSION_RATE = 0.1
     DECAY_RATE = 0.01
-    NUM_AGENTS = 10000
+    NUM_AGENTS = 15000
     NUM_STEPS = 1000
 
     # paremets from the paper
     p = 2.08  # in our case we got this val. percentage of agents over the screen. they want 3-15 percent.
     diffK = 3  # diffusion kernel.
     decayT = 0.1  # Trail decay rate
-    wProj = 0.05  # Pre-pattern stimulus projection weight (optional)
-    boundary = "periodic"  # Toroidal boundaries (not implemented here)
+    wProj = 0.05  # Pre-pattern stimulus projection weight
+    boundary = (
+        "periodic"  # Toroidal boundaries (not implemented here) aka infinite plane.
+    )
 
     # Agent parameters
     SA = 45 * np.pi / 180  # 45° in radians
@@ -51,7 +52,7 @@ def main():
     depT = 5  # Chemoattractant deposition per step
     pCD = 0.01  # Probability of random direction change
 
-    show_agents = True
+    show_agents = False  # Set to True to show agents as dots
 
     cv2.namedWindow("Trails", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("Trails", WIDTH, HEIGHT)

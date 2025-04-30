@@ -44,18 +44,30 @@ class Agent:
             np.sin(self.sensor_angle + (max_index - 1) * self.RA),
         )
 
+    # def move(self):
+    #     # the step size can be 1 or 2. both show different things slightly. 2 might skip over stuff.
+    #     self.x += self.direction[0] * 1
+    #     self.y += self.direction[1] * 1
+    #     self.x = max(0, min(self.width - 1, self.x))
+    #     self.y = max(0, min(self.height - 1, self.y))
+
+    # # make sure this and move are the same.
+    # def project_move(self):
+    #     # Calculate the projected position without modifying the actual position
+    #     projected_x = max(0, min(self.width - 1, self.x + self.direction[0] * 1))
+    #     projected_y = max(0, min(self.height - 1, self.y + self.direction[1] * 1))
+    #     return projected_x, projected_y
+
+    # different boundaries. infinite plane. it still behaves weidly.
     def move(self):
-        # the step size can be 1 or 2. both show different things slightly. 2 might skip over stuff.
         self.x += self.direction[0] * 1
         self.y += self.direction[1] * 1
-        self.x = max(0, min(self.width - 1, self.x))
-        self.y = max(0, min(self.height - 1, self.y))
+        self.x %= self.width
+        self.y %= self.height
 
-    # make sure this and move are the same.
     def project_move(self):
-        # Calculate the projected position without modifying the actual position
-        projected_x = max(0, min(self.width - 1, self.x + self.direction[0] * 1))
-        projected_y = max(0, min(self.height - 1, self.y + self.direction[1] * 1))
+        projected_x = (self.x + self.direction[0] * 1) % self.width
+        projected_y = (self.y + self.direction[1] * 1) % self.height
         return projected_x, projected_y
 
     def deposit(self, local_grid):

@@ -4,3 +4,5 @@
 4.  i dont think food has any effect on it at all... hmm.
 
 5.  make food better.
+
+food and boundaries left to do.
