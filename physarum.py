@@ -98,8 +98,8 @@ def main():
     # maybe get this from config.
     WIDTH, HEIGHT = 800, 600
     DECAY_RATE = 0.01
-    NUM_AGENTS = 1  # 15000
-    NUM_STEPS = 13000
+    NUM_AGENTS = 15000  # 15000
+    NUM_STEPS = 10000
     frames_per_second = 30
 
     seed = 42
@@ -124,7 +124,7 @@ def main():
     show_agents = False  # Set to True to show agents as dots
 
     # Create a blank grid
-    grid = initialise_grids(WIDTH + 10, HEIGHT + 10)
+    grid = initialise_grids(WIDTH, HEIGHT)
     # Create agents
     agents, occupied = initialise_agents(
         NUM_AGENTS, WIDTH, HEIGHT, SO, SA, RA, depT, seed
@@ -206,8 +206,8 @@ def main():
         cv2.waitKey(1)
 
     # Save the frames as a GIF
-    gif_frames = [cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) for frame in frames]
-    imageio.mimsave("simulation.gif", gif_frames, fps=frames_per_second)
+    # gif_frames = [cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) for frame in frames]
+    # imageio.mimsave("simulation.gif", gif_frames, fps=frames_per_second)
     cv2.destroyAllWindows()
 
 

@@ -19,8 +19,6 @@ class Agent:
         self.sensor_angle = random.uniform(0, 2 * np.pi)
 
     def sense(self, local_grid):
-
-        # Sensors are placed at ±SA from the agent's forward direction
         sensor_angles = [
             self.sensor_angle - self.SA,
             self.sensor_angle,
@@ -28,15 +26,13 @@ class Agent:
         ]
         sensor_positions = [
             (
-                int(self.x + np.cos(angle) * self.SO),
-                int(self.y + np.sin(angle) * self.SO),
+                int((self.x + np.cos(angle) * self.SO) % self.width),
+                int((self.y + np.sin(angle) * self.SO) % self.height),
             )
             for angle in sensor_angles
         ]
-        sensor_values = [
-            local_grid[y, x, 1] if 0 <= x < self.width and 0 <= y < self.height else 0
-            for x, y in sensor_positions
-        ]
+        sensor_values = [local_grid[y, x, 1] for x, y in sensor_positions]
+
         max_index = np.argmax(sensor_values)
         # Rotate the agent's direction based on RA
         self.direction = (
@@ -46,10 +42,9 @@ class Agent:
 
     # different boundaries. infinite plane. it still behaves weidly.
     def move(self):
-        self.x += self.direction[0] * 1
-        self.y += self.direction[1] * 1
-        self.x %= self.width
-        self.y %= self.height
+
+        self.x = (self.x + self.direction[0]) % self.width
+        self.y = (self.y + self.direction[1]) % self.height
 
     def project_move(self):
         projected_x = (self.x + self.direction[0] * 1) % self.width
