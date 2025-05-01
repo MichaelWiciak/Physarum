@@ -2,6 +2,8 @@ import numpy as np
 import cv2
 from agent import Agent
 import random
+import imageio
+from PIL import Image, ImageDraw, ImageFont
 
 
 def initialise_grids(width, height):
@@ -65,9 +67,16 @@ def draw_agents(agents, grid):
 
 
 def draw_trails(grid):
-    # Draw trails
+    # Draw trails/ weird
     trails = np.zeros((grid.shape[0], grid.shape[1]), dtype=np.uint8)
     trails[:, :] = grid[:, :, 1] * 255
+    return trails
+
+
+def draw_norma_trails(grid):
+    trails = grid[:, :, 1]
+    trails = (trails - trails.min()) / (trails.max() - trails.min())
+    trails = (trails * 255).astype(np.uint8)
     return trails
 
 
@@ -75,8 +84,8 @@ def main():
     # maybe get this from config.
     WIDTH, HEIGHT = 800, 600
     DECAY_RATE = 0.01
-    NUM_AGENTS = 1500
-    NUM_STEPS = 13000
+    NUM_AGENTS = 15000
+    NUM_STEPS = 100
 
     # paremets from the paper
     p = 2.08  # in our case we got this val. percentage of agents over the screen. they want 3-15 percent.
@@ -121,15 +130,18 @@ def main():
     cv2.imshow("Trails", trails)
     cv2.waitKey(0)
 
-    for _ in range(NUM_STEPS):  # change _ to i when debugging
+    # Create a list to store frames for the GIF
+    frames = []
+
+    # Load a font for drawing the step number
+    font = cv2.FONT_HERSHEY_SIMPLEX
+
+    for step in range(NUM_STEPS):  # change _ to step for debugging
         for agent in agents:
             agent.sense(grid)
-            # old_pos = (int(agent.x), int(agent.y))
             old_pos = (agent.x, agent.y)
-            # this should be float but int causes errors, not sure why.
-            # print("Step", i, "Agent", agents.index(agent))
-            # print("old position", old_pos)
-            # as the paper wanted, random chance of changing direction.
+
+            # Random chance of changing direction
             if random.random() < pCD:
                 agent.reorient()
 
@@ -143,7 +155,6 @@ def main():
                         old_pos,
                     )
                 agent.move()
-                # new_pos = (int(agent.x), int(agent.y))
                 new_pos = (agent.x, agent.y)
                 occupied.add(new_pos)
                 agent.deposit(grid)
@@ -151,18 +162,35 @@ def main():
                 # Stay in place, reorient randomly
                 agent.reorient()
 
-        # option 1: 3×3 mean filter
+        # Apply trail filtering
         filter_trails(grid, DECAY_RATE)
 
+        # Draw the trails or agents
         if show_agents:
             trails = draw_agents(agents, grid)
-            cv2.imshow("Trails", trails)
         else:
-            # Use trail-map (channel 1)
-            trails = draw_trails(grid)
-            cv2.imshow("Trails", trails)
+            trails = draw_norma_trails(grid)
 
+        # Add step number to the frame
+        trails_with_text = cv2.cvtColor(trails, cv2.COLOR_GRAY2BGR)
+        text = f"Step: {step + 1}"
+        text_size = cv2.getTextSize(text, font, 0.5, 1)[0]
+        text_x = (trails_with_text.shape[1] - text_size[0]) // 2
+        text_y = trails_with_text.shape[0] - 10
+        cv2.putText(
+            trails_with_text, text, (text_x, text_y), font, 0.5, (255, 255, 255), 1
+        )
+
+        # Append the frame to the list
+        frames.append(trails_with_text)
+
+        # Show the frame
+        cv2.imshow("Trails", trails_with_text)
         cv2.waitKey(1)
+
+    # Save the frames as a GIF
+    gif_frames = [cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) for frame in frames]
+    imageio.mimsave("simulation.gif", gif_frames, fps=30)
 
     cv2.destroyAllWindows()
 
