@@ -33,22 +33,11 @@ def initialise_agents(num_agents, width, height, SO, SA, RA, depT, seed=None):
     return agents, occupied
 
 
-def initialise_food(grid, food_size, width, height):
-    # Initialise the grid with two small squares of food.
-    center_y = height // 2
-    # Left square
-    grid[
-        center_y - food_size // 2 : center_y + food_size // 2,
-        width // 4 - food_size // 2 : width // 4 + food_size // 2,
-        0,
-    ] = 1.0
-
-    # Right square
-    grid[
-        center_y - food_size // 2 : center_y + food_size // 2,
-        3 * width // 4 - food_size // 2 : 3 * width // 4 + food_size // 2,
-        0,
-    ] = 1.0
+def create_stimulus_grid(width, height, points, intensity=1.0):
+    stimulus_grid = np.zeros((height, width))
+    for x, y in points:
+        stimulus_grid[y % height, x % width] = intensity
+    return stimulus_grid
 
 
 def filter_trails(grid, decay_rate):
@@ -104,20 +93,12 @@ def main():
 
     seed = 42
 
-    # paremets from the paper
-    p = 2.08  # in our case we got this val. percentage of agents over the screen. they want 3-15 percent.
-    diffK = 3  # diffusion kernel.
-    decayT = 0.1  # Trail decay rate
-    wProj = 0.05  # Pre-pattern stimulus projection weight
-    boundary = (
-        "periodic"  # Toroidal boundaries (not implemented here) aka infinite plane.
-    )
+    boundary = "Toroidal boundaries"  # infinite plane.
 
     # Agent parameters
     SA = 45 * np.pi / 180  # 45° in radians
     RA = 45 * np.pi / 180  # 45° rotation angle
     SO = 9  # Sensor offset distance (pixels)
-    SS = 1  # Step size
     depT = 5  # Chemoattractant deposition per step
     pCD = 0.01  # Probability of random direction change
 
@@ -129,10 +110,9 @@ def main():
     agents, occupied = initialise_agents(
         NUM_AGENTS, WIDTH, HEIGHT, SO, SA, RA, depT, seed
     )
-
-    # Initialise food/ need to fix
-    # food_size = 10
-    # initialise_food(grid, food_size, WIDTH, HEIGHT)
+    stimulus_points = []
+    stimulus_grid = create_stimulus_grid(WIDTH, HEIGHT, stimulus_points)
+    stimulus_weight = 0.50  # Weighting factor (0.01-0.1)
 
     # open the window and wait for a key press (show initial food)
     cv2.namedWindow("Trails", cv2.WINDOW_NORMAL)
@@ -156,6 +136,9 @@ def main():
     font = cv2.FONT_HERSHEY_SIMPLEX
 
     for step in range(NUM_STEPS):  # change _ to step for debugging
+        # Project pre-pattern stimuli into the chemo layer
+        grid[:, :, 1] += stimulus_grid * stimulus_weight
+
         for agent in agents:
             agent.sense(grid)
             # Random chance of changing direction
@@ -197,6 +180,10 @@ def main():
         cv2.putText(
             trails_with_text, text, (text_x, text_y), font, 0.5, (255, 255, 255), 1
         )
+
+        # append the pre-pattern stimuli to the frame as red dots
+        for x, y in stimulus_points:
+            cv2.circle(trails_with_text, (x, y), 5, (0, 0, 255), -1)
 
         # Append the frame to the list
         frames.append(trails_with_text)
