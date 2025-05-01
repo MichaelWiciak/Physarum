@@ -28,12 +28,55 @@ def initialise_agents(num_agents, width, height, SO, SA, RA, depT):
     return agents, occupied
 
 
+def initialise_food(grid, food_size, width, height):
+    # Initialise the grid with two small squares of food.
+    center_y = height // 2
+    # Left square
+    grid[
+        center_y - food_size // 2 : center_y + food_size // 2,
+        width // 4 - food_size // 2 : width // 4 + food_size // 2,
+        0,
+    ] = 1.0
+
+    # Right square
+    grid[
+        center_y - food_size // 2 : center_y + food_size // 2,
+        3 * width // 4 - food_size // 2 : 3 * width // 4 + food_size // 2,
+        0,
+    ] = 1.0
+
+
+def filter_trails(grid, decay_rate):
+    # Apply a Gaussian filter to the trail map
+    kernel = np.ones((3, 3), np.float32) / 9
+    grid[:, :, 1] = cv2.filter2D(grid[:, :, 1], -1, kernel)
+    grid[:, :, 1] *= 1 - decay_rate
+    return grid
+
+
+def draw_agents(agents, grid):
+    # Draw agents as dots
+    trails = np.zeros((grid.shape[0], grid.shape[1]), dtype=np.uint8)
+    for agent in agents:
+        grid_x = int(agent.x)
+        grid_y = int(agent.y)
+        trails[grid_y, grid_x] = 255
+    return trails
+
+
+def draw_trails(grid):
+    # Draw trails
+    trails = np.zeros((grid.shape[0], grid.shape[1]), dtype=np.uint8)
+    trails[:, :] = grid[:, :, 1] * 255
+    return trails
+
+
 def main():
     # maybe get this from config.
     WIDTH, HEIGHT = 800, 600
     DECAY_RATE = 0.01
-    NUM_AGENTS = 15000
-    NUM_STEPS = 1000
+    NUM_AGENTS = 1500
+    NUM_STEPS = 13000
 
     # paremets from the paper
     p = 2.08  # in our case we got this val. percentage of agents over the screen. they want 3-15 percent.
@@ -54,35 +97,22 @@ def main():
 
     show_agents = False  # Set to True to show agents as dots
 
-    cv2.namedWindow("Trails", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Trails", WIDTH, HEIGHT)
-
     # Create a blank grid
     grid = initialise_grids(WIDTH + 10, HEIGHT + 10)
     # Create agents
     agents, occupied = initialise_agents(NUM_AGENTS, WIDTH, HEIGHT, SO, SA, RA, depT)
 
-    # Initialise the grid with two small squares of food.
-    food_size = 10
-    center_y = HEIGHT // 2
-    # Left square
-    grid[
-        center_y - food_size // 2 : center_y + food_size // 2,
-        WIDTH // 4 - food_size // 2 : WIDTH // 4 + food_size // 2,
-        0,
-    ] = 1.0
+    # Initialise food/ need to fix
+    # food_size = 10
+    # initialise_food(grid, food_size, WIDTH, HEIGHT)
 
-    # Right square
-    grid[
-        center_y - food_size // 2 : center_y + food_size // 2,
-        3 * WIDTH // 4 - food_size // 2 : 3 * WIDTH // 4 + food_size // 2,
-        0,
-    ] = 1.0
-
-    # open the window and wait for a key press
+    # open the window and wait for a key press (show initial food)
+    cv2.namedWindow("Trails", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Trails", WIDTH, HEIGHT)
     cv2.imshow("Trails", grid[:, :, 0] * 255)
     cv2.waitKey(0)
 
+    # Show agent positions.
     trails = np.zeros((HEIGHT, WIDTH), dtype=np.uint8)
     for agent in agents:
         grid_x = int(agent.x)
@@ -122,23 +152,14 @@ def main():
                 agent.reorient()
 
         # option 1: 3×3 mean filter
-        kernel = np.ones((3, 3), np.float32) / 9
-        grid[:, :, 1] = cv2.filter2D(grid[:, :, 1], -1, kernel)
-        grid[:, :, 1] *= 1 - DECAY_RATE  # decay the trail
+        filter_trails(grid, DECAY_RATE)
 
         if show_agents:
-            # Draw agents as dots
-            trails = np.zeros((HEIGHT, WIDTH), dtype=np.uint8)
-            for agent in agents:
-                grid_x = int(agent.x)
-                grid_y = int(agent.y)
-                trails[grid_y, grid_x] = 255
+            trails = draw_agents(agents, grid)
             cv2.imshow("Trails", trails)
         else:
             # Use trail-map (channel 1)
-            trails = grid[:, :, 1]
-            trails = (trails - trails.min()) / (trails.max() - trails.min())
-            trails = (trails * 255).astype(np.uint8)
+            trails = draw_trails(grid)
             cv2.imshow("Trails", trails)
 
         cv2.waitKey(1)
