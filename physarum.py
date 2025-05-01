@@ -3,7 +3,6 @@ import cv2
 from agent import Agent
 import random
 import imageio
-from PIL import Image, ImageDraw, ImageFont
 
 
 def initialise_grids(width, height):
@@ -11,8 +10,12 @@ def initialise_grids(width, height):
     return grid
 
 
-def initialise_agents(num_agents, width, height, SO, SA, RA, depT):
-    # need to initialise agents in a unoccpied position
+def initialise_agents(num_agents, width, height, SO, SA, RA, depT, seed=None):
+    # Initialize agents in unoccupied positions with optional seeding
+    if seed is not None:
+        random.seed(seed)
+        np.random.seed(seed)
+
     agents = []
     occupied = set()
 
@@ -80,12 +83,26 @@ def draw_norma_trails(grid):
     return trails
 
 
+def add_step_number_to_frame(frame, step):
+    # Add step number to the frame
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    text = f"Step: {step + 1}"
+    text_size = cv2.getTextSize(text, font, 0.5, 1)[0]
+    text_x = (frame.shape[1] - text_size[0]) // 2
+    text_y = frame.shape[0] - 10
+    cv2.putText(frame, text, (text_x, text_y), font, 0.5, (255, 255, 255), 1)
+    return frame
+
+
 def main():
     # maybe get this from config.
     WIDTH, HEIGHT = 800, 600
     DECAY_RATE = 0.01
-    NUM_AGENTS = 15000
-    NUM_STEPS = 100
+    NUM_AGENTS = 1  # 15000
+    NUM_STEPS = 13000
+    frames_per_second = 30
+
+    seed = 42
 
     # paremets from the paper
     p = 2.08  # in our case we got this val. percentage of agents over the screen. they want 3-15 percent.
@@ -109,7 +126,9 @@ def main():
     # Create a blank grid
     grid = initialise_grids(WIDTH + 10, HEIGHT + 10)
     # Create agents
-    agents, occupied = initialise_agents(NUM_AGENTS, WIDTH, HEIGHT, SO, SA, RA, depT)
+    agents, occupied = initialise_agents(
+        NUM_AGENTS, WIDTH, HEIGHT, SO, SA, RA, depT, seed
+    )
 
     # Initialise food/ need to fix
     # food_size = 10
@@ -139,12 +158,10 @@ def main():
     for step in range(NUM_STEPS):  # change _ to step for debugging
         for agent in agents:
             agent.sense(grid)
-            old_pos = (agent.x, agent.y)
-
             # Random chance of changing direction
             if random.random() < pCD:
                 agent.reorient()
-
+            old_pos = (agent.x, agent.y)
             projected_x, projected_y = agent.project_move()
             if (projected_x, projected_y) not in occupied:
                 try:
@@ -190,8 +207,7 @@ def main():
 
     # Save the frames as a GIF
     gif_frames = [cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) for frame in frames]
-    imageio.mimsave("simulation.gif", gif_frames, fps=30)
-
+    imageio.mimsave("simulation.gif", gif_frames, fps=frames_per_second)
     cv2.destroyAllWindows()
 
 

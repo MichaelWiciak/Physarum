@@ -10,10 +10,10 @@ class Agent:
         self.y = float(y)
         self.direction = (random.uniform(-1, 1), random.uniform(-1, 1))
         self.sensor_offset = SO
-        self.SA = SA  # Sensor angle
-        self.SO = SO  # Sensor offset
-        self.RA = RA  # Rotation angle
-        self.depT = depT  # Chemoattractant deposition
+        self.SA = SA
+        self.SO = SO
+        self.RA = RA
+        self.depT = depT
 
         # can make it sense 180 or 360. current is 360. 180 is: random.uniform(0, np.pi). different behaviousr. very.
         self.sensor_angle = random.uniform(0, 2 * np.pi)
@@ -43,20 +43,6 @@ class Agent:
             np.cos(self.sensor_angle + (max_index - 1) * self.RA),
             np.sin(self.sensor_angle + (max_index - 1) * self.RA),
         )
-
-    # def move(self):
-    #     # the step size can be 1 or 2. both show different things slightly. 2 might skip over stuff.
-    #     self.x += self.direction[0] * 1
-    #     self.y += self.direction[1] * 1
-    #     self.x = max(0, min(self.width - 1, self.x))
-    #     self.y = max(0, min(self.height - 1, self.y))
-
-    # # make sure this and move are the same.
-    # def project_move(self):
-    #     # Calculate the projected position without modifying the actual position
-    #     projected_x = max(0, min(self.width - 1, self.x + self.direction[0] * 1))
-    #     projected_y = max(0, min(self.height - 1, self.y + self.direction[1] * 1))
-    #     return projected_x, projected_y
 
     # different boundaries. infinite plane. it still behaves weidly.
     def move(self):
