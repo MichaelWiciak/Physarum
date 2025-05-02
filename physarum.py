@@ -139,9 +139,14 @@ def main():
         # Project pre-pattern stimuli into the chemo layer
         grid[:, :, 1] += stimulus_grid * stimulus_weight
 
+        # GLOBAL SCHEDULER FOR SENSING (randomize order)
+        random.shuffle(agents)
         for agent in agents:
             agent.sense(grid)
-            # Random chance of changing direction
+
+        # GLOBAL SCHEDULER FOR MOVEMENT (randomize order again)
+        random.shuffle(agents)
+        for agent in agents:
             if random.random() < pCD:
                 agent.reorient()
             old_pos = (agent.x, agent.y)
@@ -159,7 +164,6 @@ def main():
                 occupied.add(new_pos)
                 agent.deposit(grid)
             else:
-                # Stay in place, reorient randomly
                 agent.reorient()
 
         # Apply trail filtering
