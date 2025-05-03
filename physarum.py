@@ -3,6 +3,8 @@ import cv2
 from agent import Agent
 import random
 import imageio
+import string
+import time
 
 
 def initialise_grids(width, height):
@@ -41,7 +43,7 @@ def create_stimulus_grid(width, height, points, intensity=1.0):
 
 
 def filter_trails(grid, decay_rate):
-    # Apply a Gaussian filter to the trail map
+    # 3x3 kernel for averaging.
     kernel = np.ones((3, 3), np.float32) / 9
     grid[:, :, 1] = cv2.filter2D(grid[:, :, 1], -1, kernel)
     grid[:, :, 1] *= 1 - decay_rate
@@ -83,12 +85,20 @@ def add_step_number_to_frame(frame, step):
     return frame
 
 
+# generate a random string of size n and end it with .csv
+def generate_random_filename(n=10):
+
+    letters = string.ascii_lowercase
+    random_string = "".join(random.choice(letters) for i in range(n))
+    return random_string + ".csv"
+
+
 def main():
     # maybe get this from config.
     WIDTH, HEIGHT = 800, 600
     DECAY_RATE = 0.01
-    NUM_AGENTS = 15000  # 15000
-    NUM_STEPS = 10000
+    NUM_AGENTS = 1000  # 15000
+    NUM_STEPS = 1000
     frames_per_second = 30
 
     seed = 42
@@ -135,17 +145,31 @@ def main():
     # Load a font for drawing the step number
     font = cv2.FONT_HERSHEY_SIMPLEX
 
+    # filename = str(NUM_AGENTS) + ".csv"
+    # with open(filename, "w", encoding="utf-8") as f:
+    #     f.write("step, sense_time, move_deposit, diffusion\n")
+
     for step in range(NUM_STEPS):  # change _ to step for debugging
+        # write the step number to the file
+        f.write(f"{step},")
+
         # Project pre-pattern stimuli into the chemo layer
         grid[:, :, 1] += stimulus_grid * stimulus_weight
 
         # GLOBAL SCHEDULER FOR SENSING (randomize order)
         random.shuffle(agents)
+        # Measure the time taken for sensing
+        # start_time = time.time()
         for agent in agents:
+            # Measure the time taken for sensing
             agent.sense(grid)
+        # sense_time = time.time() - start_time
+        # f.write(f"{sense_time},")
 
         # GLOBAL SCHEDULER FOR MOVEMENT (randomize order again)
         random.shuffle(agents)
+        # Measure the time taken for movement
+        # start_time = time.time()
         for agent in agents:
             if random.random() < pCD:
                 agent.reorient()
@@ -159,15 +183,23 @@ def main():
                         "Warning: Tried to remove a position that wasn't occupied!",
                         old_pos,
                     )
+                # meaure time for move
                 agent.move()
                 new_pos = (agent.x, agent.y)
                 occupied.add(new_pos)
+                # measure time for deposit
                 agent.deposit(grid)
             else:
                 agent.reorient()
+        # move_deposit_time = time.time() - start_time
+        # f.write(f"{move_deposit_time},")
 
         # Apply trail filtering
+        # Measure the time taken for diffusion
+        # start_time = time.time()
         filter_trails(grid, DECAY_RATE)
+        # diffusion_time = time.time() - start_time
+        # f.write(f"{diffusion_time}\n")
 
         # Draw the trails or agents
         if show_agents:
