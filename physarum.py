@@ -50,6 +50,26 @@ def filter_trails(grid, decay_rate):
     return grid
 
 
+def gaussian_blur(grid, k=3):
+    # note that apparenlty the kernel size must be odd.
+    grid[:, :, 1] = cv2.GaussianBlur(grid[:, :, 1], (k, k), sigmaX=0)
+    return grid
+
+
+def median_blur(grid, k=3):
+    grid[:, :, 1] = cv2.medianBlur(grid[:, :, 1].astype(np.float32), k).astype(
+        np.float32
+    )
+    return grid
+
+
+def bilateral_filter(grid):
+    grid[:, :, 1] = cv2.bilateralFilter(
+        grid[:, :, 1].astype(np.float32), d=5, sigmaColor=75, sigmaSpace=75
+    )
+    return grid
+
+
 def draw_agents(agents, grid):
     # Draw agents as dots
     trails = np.zeros((grid.shape[0], grid.shape[1]), dtype=np.uint8)
@@ -95,10 +115,10 @@ def generate_random_filename(n=10):
 
 def main():
     # maybe get this from config.
-    WIDTH, HEIGHT = 800, 600
+    WIDTH, HEIGHT = 100, 100
     DECAY_RATE = 0.01
-    NUM_AGENTS = 1000  # 15000
-    NUM_STEPS = 1000
+    NUM_AGENTS = 10  # 15000
+    NUM_STEPS = 100
     frames_per_second = 30
 
     seed = 42
@@ -112,7 +132,7 @@ def main():
     depT = 5  # Chemoattractant deposition per step
     pCD = 0.01  # Probability of random direction change
 
-    show_agents = False  # Set to True to show agents as dots
+    show_agents = True  # Set to True to show agents as dots
 
     # Create a blank grid
     grid = initialise_grids(WIDTH, HEIGHT)
@@ -151,7 +171,7 @@ def main():
 
     for step in range(NUM_STEPS):  # change _ to step for debugging
         # write the step number to the file
-        f.write(f"{step},")
+        # f.write(f"{step},")
 
         # Project pre-pattern stimuli into the chemo layer
         grid[:, :, 1] += stimulus_grid * stimulus_weight
@@ -229,8 +249,16 @@ def main():
         cv2.waitKey(1)
 
     # Save the frames as a GIF
-    # gif_frames = [cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) for frame in frames]
-    # imageio.mimsave("simulation.gif", gif_frames, fps=frames_per_second)
+    gif_frames = [cv2.cvtColor(frame, cv2.COLOR_BGR2RGB) for frame in frames]
+    out = cv2.VideoWriter(
+        "simulation.mp4",
+        cv2.VideoWriter_fourcc(*"mp4v"),
+        frames_per_second,
+        (WIDTH, HEIGHT),
+    )
+    for frame in frames:
+        out.write(frame)
+    out.release()
     cv2.destroyAllWindows()
 
 

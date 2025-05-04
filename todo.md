@@ -20,3 +20,7 @@ whats useful:
 and time over step count should be the same anyways.
 
 performance analysis is hard since we dont know what he did exactly so hard to say how it was improved?
+
+ok, so to do:
+obstacles?
+allow for the simulation to be run without a GUI, just a command line and does it in a background so we can test actually the improvements in our code.
