@@ -50,23 +50,26 @@ def filter_trails(grid, decay_rate):
     return grid
 
 
-def gaussian_blur(grid, k=3):
+def gaussian_blur(grid, k=3, decay_rate=0.01):
     # note that apparenlty the kernel size must be odd.
     grid[:, :, 1] = cv2.GaussianBlur(grid[:, :, 1], (k, k), sigmaX=0)
+    grid[:, :, 1] *= 1 - decay_rate
     return grid
 
 
-def median_blur(grid, k=3):
-    grid[:, :, 1] = cv2.medianBlur(grid[:, :, 1].astype(np.float32), k).astype(
-        np.float32
-    )
-    return grid
-
-
-def bilateral_filter(grid):
+def bilateral_filter(grid, decay_rate=0.01):
     grid[:, :, 1] = cv2.bilateralFilter(
-        grid[:, :, 1].astype(np.float32), d=5, sigmaColor=75, sigmaSpace=75
+        grid[:, :, 1].astype(np.float32), d=3, sigmaColor=75, sigmaSpace=75
     )
+    grid[:, :, 1] *= 1 - decay_rate
+    return grid
+
+
+def custom_blur(grid, decay_rate=0.01):
+    kernel = np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]], dtype=np.float32)
+    kernel /= kernel.sum()
+    grid[:, :, 1] = cv2.filter2D(grid[:, :, 1], -1, kernel)
+    grid[:, :, 1] *= 1 - decay_rate
     return grid
 
 
@@ -89,7 +92,8 @@ def draw_trails(grid):
 
 def draw_norma_trails(grid):
     trails = grid[:, :, 1]
-    trails = (trails - trails.min()) / (trails.max() - trails.min())
+    eps = 1e-8
+    trails = (trails - trails.min()) / (trails.max() - trails.min() + eps)
     trails = (trails * 255).astype(np.uint8)
     return trails
 
@@ -115,10 +119,10 @@ def generate_random_filename(n=10):
 
 def main():
     # maybe get this from config.
-    WIDTH, HEIGHT = 100, 100
+    WIDTH, HEIGHT = 800, 600
     DECAY_RATE = 0.01
-    NUM_AGENTS = 10  # 15000
-    NUM_STEPS = 100
+    NUM_AGENTS = 1  # 15000
+    NUM_STEPS = 1000
     frames_per_second = 30
 
     seed = 42
@@ -217,7 +221,9 @@ def main():
         # Apply trail filtering
         # Measure the time taken for diffusion
         # start_time = time.time()
-        filter_trails(grid, DECAY_RATE)
+
+        grid = custom_blur(grid, DECAY_RATE)
+        # grid = filter_trails(grid, DECAY_RATE)
         # diffusion_time = time.time() - start_time
         # f.write(f"{diffusion_time}\n")
 
