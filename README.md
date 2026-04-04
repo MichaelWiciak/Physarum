@@ -4,7 +4,7 @@ A biologically-inspired optimisation algorithm that simulates the foraging behav
 
 ## Demo Videos
 
-|                                     MST Optimization                                      |                                      Dense Start Simulation                                       |                                       Agent Visualization                                        |
+|                                     MST optimisation                                      |                                      Dense Start Simulation                                       |                                       Agent Visualization                                        |
 | :---------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------: |
 | [![MST Demo](https://img.youtube.com/vi/7ZkC3MxK37Q/0.jpg)](https://youtu.be/7ZkC3MxK37Q) | [![Dense Start Demo](https://img.youtube.com/vi/TFyH6HfQy6c/0.jpg)](https://youtu.be/TFyH6HfQy6c) | [![Agent View Demo](https://img.youtube.com/vi/dhvJkvUcZjE/0.jpg)](https://youtu.be/dhvJkvUcZjE) |
 
@@ -69,7 +69,7 @@ Modify `physarum.py` to adjust simulation parameters.
 ├── agent.py             # Agent behavior logic
 ├── requirements.txt     # Dependencies
 ├── Interesting_data/    # Experiment results and visualizations
-│   ├── MinimumSpaningTree/   # MST optimization experiments
+│   ├── MinimumSpaningTree/   # MST optimisation experiments
 │   ├── DenseStart/           # Dense initialization tests
 │   ├── AgentView/            # Agent behavior visualization
 │   ├── Test1-3/              # Parameter variation experiments
