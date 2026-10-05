@@ -1,2 +1,16 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Normalise text files to LF in the repository.
+* text=auto eol=lf
+
+*.py text diff=python
+*.md text
+*.toml text
+*.yml text
+
+# Binary assets: never normalise, never treat as text.
+*.png binary
+*.gif binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.mp4 binary
+*.csv text

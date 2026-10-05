@@ -1,4 +1,5 @@
 import random
+
 import numpy as np
 
 
@@ -15,7 +16,6 @@ class Agent:
         self.RA = RA
         self.depT = depT
 
-        # can make it sense 180 or 360. current is 360. 180 is: random.uniform(0, np.pi). different behaviousr. very.
         self.sensor_angle = random.uniform(0, 2 * np.pi)
 
     def sense(self, local_grid):
@@ -34,13 +34,11 @@ class Agent:
         sensor_values = [local_grid[y, x, 1] for x, y in sensor_positions]
 
         max_index = np.argmax(sensor_values)
-        # Rotate the agent's direction based on RA
         self.direction = (
             np.cos(self.sensor_angle + (max_index - 1) * self.RA),
             np.sin(self.sensor_angle + (max_index - 1) * self.RA),
         )
 
-    # different boundaries. infinite plane. it still behaves weidly.
     def move(self):
         self.x = (self.x + self.direction[0]) % self.width
         self.y = (self.y + self.direction[1]) % self.height
@@ -51,11 +49,8 @@ class Agent:
         return projected_x, projected_y
 
     def deposit(self, local_grid):
-        # Convert position to integers for grid indexing
         grid_x = int(self.x)
         grid_y = int(self.y)
-        # hmmm.
-        # local_grid[grid_y, grid_x, 0] += 0.1
         local_grid[grid_y, grid_x, 1] += self.depT
 
     def reorient(self):
