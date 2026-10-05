@@ -1,9 +1,29 @@
-.venv
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
 
-__pycache__
+# Virtual environments
+.venv/
+venv/
+env/
 
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Simulation output
 *.mp4
+*.avi
+*.mov
+results/raw/
 
+# Editors and OS
 .DS_Store
-
-*.zip
+Thumbs.db
+.idea/
+.vscode/
