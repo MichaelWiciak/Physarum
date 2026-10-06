@@ -6,7 +6,7 @@ A biologically-inspired optimisation algorithm that simulates the foraging behav
 
 |                                     MST optimisation                                      |                                      Dense Start Simulation                                       |                                       Agent Visualization                                        |
 | :---------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------: |
-| [![MST Demo](https://img.youtube.com/vi/7ZkC3MxK37Q/0.jpg)](https://youtu.be/7ZkC3MxK37Q) | [![Dense Start Demo](https://img.youtube.com/vi/TFyH6HfQy6c/0.jpg)](https://youtu.be/TFyH6HfQy6c) | [![Agent View Demo](https://img.youtube.com/vi/dhvJkvUcZjE/0.jpg)](https://youtu.be/dhvJkvUcZjE) |
+| [![MST Demo](https://img.youtube.com/vi/TFyH6HfQy6c/0.jpg)](https://youtu.be/TFyH6HfQy6c)  | [![Dense Start Demo](https://img.youtube.com/vi/7ZkC3MxK37Q/0.jpg)](https://youtu.be/7ZkC3MxK37Q) | [![Agent View Demo](https://img.youtube.com/vi/jGuQTW-x11c/0.jpg)](https://youtu.be/jGuQTW-x11c) |
 
 ## Quick Start
 
@@ -82,7 +82,7 @@ Evolution of network topology as the slime mold finds optimal connections betwee
 | :-------------------------------------------------------: | :------------------------------------------------------------: | :-------------------------------------------------------: |
 | ![MST 1](results/images/minimum_spanning_tree/mst_01.png) |   ![MST 2](results/images/minimum_spanning_tree/mst_02.png)    | ![MST 3](results/images/minimum_spanning_tree/mst_03.png) |
 | ![MST 4](results/images/minimum_spanning_tree/mst_04.png) |   ![MST 5](results/images/minimum_spanning_tree/mst_05.png)    | ![MST 6](results/images/minimum_spanning_tree/mst_06.png) |
-| ![MST 7](results/images/minimum_spanning_tree/mst_07.png) | ![Result](results/images/minimum_spanning_tree/mst_result.png) |       ![Simulation](results/images/simulation.gif)        |
+| ![MST 7](results/images/minimum_spanning_tree/mst_07.png) | ![Result](results/images/minimum_spanning_tree/mst_result.png) |
 
 ### Dense Start Simulation
 
