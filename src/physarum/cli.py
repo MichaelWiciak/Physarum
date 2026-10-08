@@ -1,6 +1,6 @@
 import argparse
 
-from physarum.simulate import Config, main
+from physarum.simulate import Config, main, resolve_seed
 
 
 def build_parser():
@@ -13,7 +13,12 @@ def build_parser():
     parser.add_argument("--num-agents", type=int, default=Config.num_agents)
     parser.add_argument("--num-steps", type=int, default=Config.num_steps)
     parser.add_argument("--decay-rate", type=float, default=Config.decay_rate)
-    parser.add_argument("--seed", type=int, default=Config.seed)
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=Config.seed,
+        help="Random seed. Defaults to a random seed each run. ",
+    )
     parser.add_argument("--sensor-offset", type=int, default=Config.sensor_offset)
     parser.add_argument(
         "--deposit-rate", type=float, default=Config.deposit_rate
@@ -78,6 +83,9 @@ def config_from_args(args):
 def run(argv=None):
     args = build_parser().parse_args(argv)
     config = config_from_args(args)
+
+    resolve_seed(config)
+    print(f"Seed: {config.seed}")
 
     if args.headless:
 

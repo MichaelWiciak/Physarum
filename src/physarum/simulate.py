@@ -17,7 +17,7 @@ class Config:
     num_agents: int = 1
     num_steps: int = 1000
     frames_per_second: int = 30
-    seed: int = 42
+    seed: int | None = None
 
     sensor_angle: float = 45 * np.pi / 180
     rotation_angle: float = 45 * np.pi / 180
@@ -41,12 +41,18 @@ BLUR_FUNCTIONS = {
 }
 
 
+def resolve_seed(config):
+    if config.seed is None:
+        config.seed = random.SystemRandom().randrange(2**32)
+    return config.seed
+
+
 def simulate(config, headless=False, writer=None):
     blur = BLUR_FUNCTIONS[config.blur]
 
-    if config.seed is not None:
-        random.seed(config.seed)
-        np.random.seed(config.seed)
+    resolve_seed(config)
+    random.seed(config.seed)
+    np.random.seed(config.seed)
 
     grid = grid_ops.initialise_grids(config.width, config.height)
     agents, occupied = initialise_agents(

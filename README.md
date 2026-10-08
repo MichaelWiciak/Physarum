@@ -6,7 +6,7 @@ A biologically-inspired optimisation algorithm that simulates the foraging behav
 
 |                                     MST optimisation                                      |                                      Dense Start Simulation                                       |                                       Agent Visualization                                        |
 | :---------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------: |
-| [![MST Demo](https://img.youtube.com/vi/TFyH6HfQy6c/0.jpg)](https://youtu.be/TFyH6HfQy6c)  | [![Dense Start Demo](https://img.youtube.com/vi/7ZkC3MxK37Q/0.jpg)](https://youtu.be/7ZkC3MxK37Q) | [![Agent View Demo](https://img.youtube.com/vi/jGuQTW-x11c/0.jpg)](https://youtu.be/jGuQTW-x11c) |
+| [![MST Demo](https://img.youtube.com/vi/TFyH6HfQy6c/0.jpg)](https://youtu.be/TFyH6HfQy6c) | [![Dense Start Demo](https://img.youtube.com/vi/7ZkC3MxK37Q/0.jpg)](https://youtu.be/7ZkC3MxK37Q) | [![Agent View Demo](https://img.youtube.com/vi/jGuQTW-x11c/0.jpg)](https://youtu.be/jGuQTW-x11c) |
 
 ## Quick Start
 
@@ -50,7 +50,7 @@ the source of truth for defaults.
 | `--num-agents`              | `1`              | Number of agents to spawn                                             |
 | `--num-steps`               | `1000`           | Simulation steps to run                                               |
 | `--decay-rate`              | `0.01`           | Fraction of trail lost each step                                      |
-| `--seed`                    | `42`             | RNG seed; a fixed seed makes runs reproducible                        |
+| `--seed`                    | random           | Random seed by default. You can specify a seed.                       |
 | `--sensor-offset`           | `9`              | Sensor distance from the agent, in pixels                             |
 | `--deposit-rate`            | `5`              | Chemoattractant deposited per step                                    |
 | `--random-direction-change` | `0.01`           | Probability of a random reorientation                                 |
