@@ -1,9 +1,11 @@
+import random
+
 import numpy as np
 
 from physarum.agent import Agent
 from physarum.grid import custom_blur, initialise_grids
 from physarum.population import initialise_agents
-from physarum.simulate import BLUR_FUNCTIONS, Config, simulate
+from physarum.simulate import BLUR_FUNCTIONS, Config, resolve_seed, simulate
 
 WIDTH, HEIGHT = 64, 48
 PARAMS = (9, np.pi / 4, np.pi / 4, 5.0)
@@ -70,3 +72,33 @@ def test_headless_simulation_is_deterministic_under_a_seed():
 
     np.testing.assert_array_equal(first, second)
     assert first[:, :, 1].sum() > 0.0
+
+
+def test_resolve_seed_keeps_an_explicit_seed():
+    config = Config(seed=99)
+
+    assert resolve_seed(config) == 99
+    assert config.seed == 99
+
+
+def test_generated_seed_ignores_the_seeded_rng():
+    random.seed(0)
+    first = Config()
+    resolve_seed(first)
+
+    random.seed(0)
+    second = Config()
+    resolve_seed(second)
+
+    assert first.seed != second.seed
+
+
+def test_seed_defaults_to_random_and_is_reproducible():
+    config = Config(width=WIDTH, height=HEIGHT, num_agents=5, num_steps=3)
+    assert config.seed is None
+
+    first = simulate(config, headless=True)
+    assert isinstance(config.seed, int)
+
+    second = simulate(config, headless=True)
+    np.testing.assert_array_equal(first, second)

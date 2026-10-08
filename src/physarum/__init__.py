@@ -10,7 +10,7 @@ from physarum.grid import (
     initialise_grids,
 )
 from physarum.population import initialise_agents
-from physarum.simulate import Config, main, simulate
+from physarum.simulate import Config, main, resolve_seed, simulate
 
 __all__ = [
     "Agent",
@@ -23,6 +23,7 @@ __all__ = [
     "initialise_agents",
     "initialise_grids",
     "main",
+    "resolve_seed",
     "simulate",
 ]
 
